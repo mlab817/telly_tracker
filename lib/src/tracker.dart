@@ -23,6 +23,7 @@ class Tracker {
       url: url,
       siteId: siteId,
       visitorId: _visitorId,
+      verbosityLevel: Level.all,
     );
   }
 
