@@ -4,5 +4,6 @@
 library;
 
 export 'src/telly_tracker_base.dart';
+export 'src/tracker.dart';
 
 // TODO: Export any libraries intended for clients of this package.
