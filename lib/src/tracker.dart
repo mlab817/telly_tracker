@@ -19,12 +19,16 @@ class Tracker {
 
   Future<void> _init({String? visitorId}) async {
     _visitorId = visitorId;
-    await MatomoTracker.instance.initialize(
-      url: url,
-      siteId: siteId,
-      visitorId: _visitorId,
-      verbosityLevel: Level.all,
-    );
+    try {
+      await MatomoTracker.instance.initialize(
+        url: url,
+        siteId: siteId,
+        visitorId: _visitorId,
+        verbosityLevel: Level.all,
+      );
+    } catch (e) {
+      print("error initializing matomo tracker: $e");
+    }
   }
 
   /// Update visitor/user ID dynamically
