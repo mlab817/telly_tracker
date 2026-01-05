@@ -1,39 +1,90 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Telly Tracker
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A Dart package for tracking events in the Tellycom mobile app using Matomo analytics.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- 🎯 Structured event tracking with funnels
+- 🔄 Built on [Matomo Tracker](https://pub.dev/packages/matomo_tracker)
+- 🛡️ Error-safe tracking that won't crash your app
+- 📊 Easy-to-extend funnel system for tracking user journeys
 
-## Getting started
+## Installation
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add `telly_tracker` to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  telly_tracker:
+    git:
+      url: https://github.com/mlab817/telly_tracker.git
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+### Initialize the Tracker
 
 ```dart
-const like = 'sample';
+import 'package:telly_tracker/telly_tracker.dart';
+
+final tracker = Tracker(
+  url: 'https://your-matomo-instance.com',
+  siteId: '1',
+  visitorId: 'optional-user-id', // Optional
+);
 ```
 
-## Additional information
+### Use Built-in Funnels
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+// Track signup events
+tracker.signup.intent();
+tracker.signup.submitted('premium');
+```
+
+### Create Custom Funnels
+
+Extend the `Funnel` class to create your own tracking funnels:
+
+```dart
+enum CheckoutStep { started, payment, completed }
+
+class CheckoutFunnel extends Funnel<CheckoutStep> {
+  CheckoutFunnel(super.tracker);
+
+  @override
+  String get category => 'Checkout';
+
+  void started() => step(CheckoutStep.started);
+  void payment(String method) => step(CheckoutStep.payment, name: method);
+  void completed(double amount) => step(CheckoutStep.completed, value: amount.toInt());
+}
+```
+
+Then add it to your `Tracker` class:
+
+```dart
+class Tracker {
+  // ... existing code ...
+  late final CheckoutFunnel checkout;
+
+  Tracker({required this.url, required this.siteId, String? visitorId}) {
+    signup = SignupFunnel(this);
+    checkout = CheckoutFunnel(this); // Add your custom funnel
+    _init(visitorId: visitorId);
+  }
+}
+```
+
+### Update Visitor ID
+
+```dart
+await tracker.updateVisitorId('new-user-id');
+```
+
+## Author
+
+**Lester Bolotaolo**  
+Tellycom LLC  
+[mlab817@gmail.com](mailto:mlab817@gmail.com)  
+[https://tellycom.io](https://tellycom.io)
